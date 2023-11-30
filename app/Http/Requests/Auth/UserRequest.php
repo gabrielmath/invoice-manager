@@ -23,9 +23,21 @@ class UserRequest extends FormRequest
     {
         return [
             'name'             => ['required', 'string'],
-            'email'            => ['required', 'email', 'lowercase', 'unique:users,email'],
+            'email'            => ['required', 'email', 'unique:users,email'],
             'password'         => ['required', 'string', 'min:8'],
             'confirm_password' => ['required', 'same:password']
         ];
+    }
+
+    /**
+     * Prepare request for validation
+     *
+     * @return void
+     */
+    public function prepareForValidation(): void
+    {
+        $this->merge([
+            'email' => mb_strtolower($this->email),
+        ]);
     }
 }
