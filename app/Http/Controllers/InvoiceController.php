@@ -45,11 +45,11 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
-        /*if (!$invoice->exists) {
+        if (!$invoice->exists) {
             return response()->json(['message' => 'Not found.'], Response::HTTP_NOT_FOUND);
         }
 
         $invoice->delete();
-        return response()->noContent();*/
+        return response()->noContent();
     }
 }

@@ -95,3 +95,62 @@ it('should can not view a invoice with logged out user', function () {
         ->assertJson(['message' => 'Unauthenticated.'])
         ->assertUnauthorized();
 });
+
+it('should can delete a invoice of user', function () {
+    $user = User::factory()->create();
+
+    Invoice::factory(2)->create(['user_id' => $user->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+
+    $this
+        ->actingAs($user)
+        ->getJson(route('invoices.destroy', ['invoice' => $invoice->id]))
+        ->assertSuccessful();
+});
+
+it('should can not delete if invoice not exists and show not found status', function () {
+    $user = User::factory()->create();
+
+    Invoice::factory(2)->create(['user_id' => $user->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+    $invoice->delete();
+
+    $this
+        ->actingAs($user)
+        ->getJson(route('invoices.destroy', ['invoice' => 1]))
+        ->assertNotFound();
+});
+
+it('should can not delete a invoice of other user', function () {
+    $user = User::factory()->create();
+    $user2 = User::factory()->create();
+
+    Invoice::factory(2)->create(['user_id' => $user->id]);
+    Invoice::factory(2)->create(['user_id' => $user2->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+
+    $this
+        ->actingAs($user2)
+        ->getJson(route('invoices.destroy', ['invoice' => $invoice->id]))
+        ->assertForbidden();
+});
+
+it('should can not delete a invoice with logged out user', function () {
+    $user = User::factory()->create();
+
+    Invoice::factory(2)->create(['user_id' => $user->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+
+    $this
+        ->getJson(route('invoices.destroy', ['invoice' => $invoice->id]))
+        ->assertJson(['message' => 'Unauthenticated.'])
+        ->assertUnauthorized();
+});
