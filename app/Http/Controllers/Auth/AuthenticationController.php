@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\AuthenticationRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response as HTTPResponse;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,5 +28,14 @@ class AuthenticationController extends Controller
             'message' => 'User logged in successfully',
             'token'   => $user->createToken('API REST TOKEN')->plainTextToken
         ], Response::HTTP_OK);
+    }
+
+    public function logout(): HTTPResponse
+    {
+        if (Auth::check()) {
+            Auth::user()->tokens()->delete();
+        }
+
+        return response()->noContent();
     }
 }

@@ -51,3 +51,24 @@ it('users should not be able to authenticate without the password', function () 
         ->assertInvalid(['password' => 'The password field is required.'])
         ->assertUnprocessable();
 });
+
+it('should users can logout', function () {
+    $user = User::factory()->create();
+
+    $this->post('/api/auth/login', [
+        'email'    => $user->email,
+        'password' => 'password'
+    ]);
+
+    $this->assertAuthenticated();
+
+    $response = $this->get('/api/auth/logout');
+    $response->assertNoContent();
+});
+
+it('users should not logout if they are not logged in', function () {
+    $this
+        ->getJson('/api/auth/logout')
+        ->assertJson(['message' => 'Unauthenticated.'])
+        ->assertUnauthorized();
+});
