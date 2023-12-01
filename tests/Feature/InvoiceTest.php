@@ -51,6 +51,21 @@ it('should view a invoice of user', function () {
         ->assertSuccessful();
 });
 
+it('should can not found if invoice not exists', function () {
+    $user = User::factory()->create();
+
+    Invoice::factory(2)->create(['user_id' => $user->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+    $invoice->delete();
+
+    $this
+        ->actingAs($user)
+        ->getJson(route('invoices.show', ['invoice' => 1]))
+        ->assertNotFound();
+});
+
 it('should can not view a invoice of other user', function () {
     $user = User::factory()->create();
     $user2 = User::factory()->create();

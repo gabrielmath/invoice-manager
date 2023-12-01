@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class InvoiceController extends Controller
 {
@@ -32,6 +33,10 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
+        if (!$invoice->exists) {
+            return response()->json(['message' => 'Not found.'], Response::HTTP_NOT_FOUND);
+        }
+
         return new InvoiceResource($invoice);
     }
 
@@ -40,6 +45,11 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
-        //
+        /*if (!$invoice->exists) {
+            return response()->json(['message' => 'Not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $invoice->delete();
+        return response()->noContent();*/
     }
 }
