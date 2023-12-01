@@ -1,10 +1,8 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
 
-uses(RefreshDatabase::class);
 
 it('should create a user', function () {
     $message = ['message' => 'User created successfully!'];
