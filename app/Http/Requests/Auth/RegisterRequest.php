@@ -4,7 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,21 @@ class UserRequest extends FormRequest
     {
         return [
             'name'             => ['required', 'string'],
-            'email'            => ['required', 'email', 'lowercase', 'unique:users,email'],
+            'email'            => ['required', 'email', 'unique:users,email'],
             'password'         => ['required', 'string', 'min:8'],
             'confirm_password' => ['required', 'same:password']
         ];
+    }
+
+    /**
+     * Prepare request for validation
+     *
+     * @return void
+     */
+    public function prepareForValidation(): void
+    {
+        $this->merge([
+            'email' => mb_strtolower($this->email),
+        ]);
     }
 }

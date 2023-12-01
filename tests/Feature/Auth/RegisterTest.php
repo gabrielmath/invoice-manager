@@ -79,20 +79,6 @@ it('should not create a user with invalid email', function () {
         ->assertUnprocessable();
 });
 
-it('should not create a user with uppercase email', function () {
-    $newUser = [
-        'name'             => 'Usuário Teste',
-        'email'            => 'TEST@EMAIL.com',
-        'password'         => '12345678',
-        'confirm_password' => '12345678',
-    ];
-
-    $this
-        ->postJson('/api/auth/register', $newUser)
-        ->assertInvalid(['email' => 'The email field must be lowercase.'])
-        ->assertUnprocessable();
-});
-
 it('should not create a user with a password shorter than 8 digits', function () {
     $newUser = [
         'name'             => 'Usuário Teste',
