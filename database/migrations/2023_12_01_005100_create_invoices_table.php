@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->char('number', 9);
+            $table->char('number', 9)->unique();
             $table->decimal('value', 10, 2);
             $table->date('issue_date');
             $table->char('sender_document', 14);

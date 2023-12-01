@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Jobs\SendInvoice;
+use App\Jobs\SendInvoiceJob;
 use App\Models\Invoice;
 use Carbon\Carbon;
 
@@ -22,6 +22,6 @@ class InvoiceObserver
      */
     public function created(Invoice $invoice): void
     {
-        SendInvoice::dispatch($invoice);
+        SendInvoiceJob::dispatch($invoice);
     }
 }
