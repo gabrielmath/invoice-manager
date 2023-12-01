@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\InvoiceController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -11,11 +14,6 @@
 |
 */
 
-/*Route::group(['prefix' => 'auth'], function () {
-    Route::post('register', RegisterController::class);
-    Route::post('login', [AuthenticationController::class, 'login']);
-
-    Route::group(['middleware' => 'auth:sanctum'], function () {
-        Route::get('logout', [AuthenticationController::class, 'logout']);
-    });
-});*/
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::apiResource('invoices', InvoiceController::class);
+});
