@@ -49,6 +49,11 @@ class Invoice extends Model
         );
     }
 
+    public function setSenderDocumentAttribute($value): void
+    {
+        $this->attributes['sender_document'] = preg_replace('/[^0-9]/is', '', $value);
+    }
+
     /**
      * Insert mask in transporter document
      *
@@ -59,6 +64,11 @@ class Invoice extends Model
         return Attribute::make(
             get: fn(mixed $value, array $attributes) => mask($attributes['transporter_document'], $this->documentMask),
         );
+    }
+
+    public function setTransporterDocumentAttribute($value): void
+    {
+        $this->attributes['transporter_document'] = preg_replace('/[^0-9]/is', '', $value);
     }
 
     public function user(): BelongsTo

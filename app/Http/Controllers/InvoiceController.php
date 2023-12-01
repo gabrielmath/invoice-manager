@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-//use App\Http\Requests\InvoiceRequest;
+use App\Http\Requests\InvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\Auth;
@@ -23,10 +23,12 @@ class InvoiceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    /*public function store(InvoiceRequest $request)
+    public function store(InvoiceRequest $request)
     {
-        //
-    }*/
+        $invoice = Auth::user()->invoices()->create($request->validated());
+
+        return new InvoiceResource($invoice);
+    }
 
     /**
      * Display the specified resource.

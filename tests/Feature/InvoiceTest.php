@@ -25,6 +25,115 @@ it('should not list with logged out user', function () {
         ->assertUnauthorized();
 });
 
+it('should create a new invoice', function () {
+    $user = User::factory()->create();
+
+    $data = [
+        'valor'              => 70.00,
+        'cnpj_remetente'     => '32.650.223/0001-90',
+        'nome_remetente'     => 'Remetente Teste',
+        'cnpj_transportador' => '41.659.336/0001-48',
+        'nome_transportador' => 'Transportador Teste',
+    ];
+
+    $response = $this
+        ->actingAs($user)
+        ->postJson(route('invoices.store'), $data);
+
+    $invoice = Invoice::first();
+
+    $response->assertJson([
+        'invoice' => [
+            'id'                 => $invoice->id,
+            'numero'             => $invoice->number,
+            'data_emissao'       => $invoice->issue_date->format('d/m/Y'),
+            'valor'              => $invoice->money_value,
+            'cnpj_remetente'     => $invoice->sender_doc,
+            'nome_remetente'     => $invoice->sender_name,
+            'cnpj_transportador' => $invoice->transporter_doc,
+            'nome_transportador' => $invoice->transporter_name,
+        ]
+    ])
+        ->assertSuccessful();
+});
+
+it('should not be able to create an invoice for another user', function () {
+    $user = User::factory()->create();
+    $user2 = User::factory()->create();
+
+    $data = [
+        'user_id'            => $user2->id,
+        'valor'              => 70.00,
+        'cnpj_remetente'     => '32.650.223/0001-90',
+        'nome_remetente'     => 'Remetente Teste',
+        'cnpj_transportador' => '41.659.336/0001-48',
+        'nome_transportador' => 'Transportador Teste',
+    ];
+
+    $this
+        ->actingAs($user)
+        ->postJson(route('invoices.store'), $data);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+
+    $this->assertNotEquals($invoice->user_id, $user2->id);
+    $this->assertEquals($invoice->user_id, $user->id);
+});
+
+it('should not create a new invoice with empty data', function () {
+    $user = User::factory()->create();
+
+    $data = [
+        'valor'              => '',
+        'cnpj_remetente'     => '',
+        'nome_remetente'     => '',
+        'cnpj_transportador' => '',
+        'nome_transportador' => '',
+    ];
+
+    $this
+        ->actingAs($user)
+        ->postJson(route('invoices.store'), $data)
+        ->assertUnprocessable();
+});
+
+it('should can not create a new invoice with invalid document', function () {
+    $user = User::factory()->create();
+
+    $data = [
+        'valor'              => 70.00,
+        'cnpj_remetente'     => '32.650.223/0001-9',
+        'nome_remetente'     => 'Remetente Teste',
+        'cnpj_transportador' => '41.659.336/0001-4',
+        'nome_transportador' => 'Transportador Teste',
+    ];
+
+    $this
+        ->actingAs($user)
+        ->postJson(route('invoices.store'), $data)
+        ->assertInvalid([
+            'sender_document'      => 'The field sender document is not valid.',
+            'transporter_document' => 'The field transporter document is not valid.',
+        ])
+        ->assertUnprocessable();
+});
+
+it('should can not create a new invoice with logged out user', function () {
+    $data = [
+        'valor'              => 70.00,
+        'cnpj_remetente'     => '32.650.223/0001-90',
+        'nome_remetente'     => 'Remetente Teste',
+        'cnpj_transportador' => '41.659.336/0001-48',
+        'nome_transportador' => 'Transportador Teste',
+    ];
+
+    $this
+        ->postJson(route('invoices.store'), $data)
+        ->assertJson(['message' => 'Unauthenticated.'])
+        ->assertUnauthorized();
+});
+
 it('should view a invoice of user', function () {
     $user = User::factory()->create();
     Invoice::factory(10)->create(['user_id' => $user->id]);
