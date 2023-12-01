@@ -23,6 +23,7 @@ class InvoiceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id'                 => $this->id,
             'numero'             => $this->number,
             'data_emissao'       => $this->issue_date->format('d/m/Y'),
             'valor'              => $this->money_value,

@@ -15,5 +15,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::apiResource('invoices', InvoiceController::class);
+    Route::apiResource('invoices', InvoiceController::class)
+        ->only(['index', 'store']);
+
+    Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])
+        ->middleware('can:view,invoice')
+        ->name('invoices.show');
+//        Route::delete('/invoices/{invoice}',[InvoiceController::class,'destroy'])->name('invoices.destroy');
 });

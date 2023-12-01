@@ -24,3 +24,59 @@ it('should not list with logged out user', function () {
         ->assertJson(['message' => 'Unauthenticated.'])
         ->assertUnauthorized();
 });
+
+it('should view a invoice of user', function () {
+    $user = User::factory()->create();
+    Invoice::factory(10)->create(['user_id' => $user->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+
+    $response = $this->actingAs($user)
+        ->getJson(route('invoices.show', ['invoice' => $invoice->id]));
+
+    $response
+        ->assertJson([
+            'invoice' => [
+                'id'                 => $invoice->id,
+                'numero'             => $invoice->number,
+                'data_emissao'       => $invoice->issue_date->format('d/m/Y'),
+                'valor'              => $invoice->money_value,
+                'cnpj_remetente'     => $invoice->sender_doc,
+                'nome_remetente'     => $invoice->sender_name,
+                'cnpj_transportador' => $invoice->transporter_doc,
+                'nome_transportador' => $invoice->transporter_name,
+            ]
+        ])
+        ->assertSuccessful();
+});
+
+it('should can not view a invoice of other user', function () {
+    $user = User::factory()->create();
+    $user2 = User::factory()->create();
+
+    Invoice::factory(2)->create(['user_id' => $user->id]);
+    Invoice::factory(2)->create(['user_id' => $user2->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+
+    $this
+        ->actingAs($user2)
+        ->getJson(route('invoices.show', ['invoice' => $invoice->id]))
+        ->assertForbidden();
+});
+
+it('should can not view a invoice with logged out user', function () {
+    $user = User::factory()->create();
+
+    Invoice::factory(2)->create(['user_id' => $user->id]);
+
+    /** @var Invoice $invoice */
+    $invoice = Invoice::first();
+
+    $this
+        ->getJson(route('invoices.show', ['invoice' => $invoice->id]))
+        ->assertJson(['message' => 'Unauthenticated.'])
+        ->assertUnauthorized();
+});
