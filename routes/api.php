@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticationController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,11 +14,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['prefix' => 'auth'], function () {
-    Route::post('register', RegisterController::class);
-    Route::post('login', [AuthenticationController::class, 'login']);
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::apiResource('invoices', InvoiceController::class)
+        ->only(['index', 'store']);
 
-    Route::group(['middleware' => 'auth:sanctum'], function () {
-        Route::get('logout', [AuthenticationController::class, 'logout']);
-    });
+    Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])
+        ->middleware('can:view,invoice')
+        ->name('invoices.show');
+
+    Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])
+        ->middleware('can:delete,invoice')
+        ->name('invoices.destroy');
 });
