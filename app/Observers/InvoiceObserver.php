@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\SendInvoice;
 use App\Models\Invoice;
 use Carbon\Carbon;
 
@@ -21,6 +22,6 @@ class InvoiceObserver
      */
     public function created(Invoice $invoice): void
     {
-        // TODO: send notification to user who owns the invoice
+        SendInvoice::dispatch($invoice);
     }
 }
